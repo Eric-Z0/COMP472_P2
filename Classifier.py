@@ -4,7 +4,7 @@ from pathlib import Path
 from CompressTech import remove_empty_strings, lower_case_words
 
 
-def run_classifier(indexer):
+def run_classifier(indexer, removeStop = False, removeBigAndSmall = False):
 
     prob_ham = indexer.calc_class_probability('ham')
     prob_spam = indexer.calc_class_probability('spam')
@@ -32,13 +32,21 @@ def run_classifier(indexer):
                     ham_score += math.log10(indexer.get_term_cp_ham(word))
                     spam_score += math.log10(indexer.get_term_cp_spam(word))
 
-            write_classification_to_file(file_ctr, file_path, ham_score, spam_score)
+            write_classification_to_file(file_ctr, file_path, ham_score, spam_score, removeStop, removeBigAndSmall)
 
 
 # Write classification result to a file
-def write_classification_to_file(file_ctr, test_file, ham_val, spam_val):
+def write_classification_to_file(file_ctr, test_file, ham_val, spam_val, removeStop, removeBigAndSmall):
 
-    class_file_path = "baseline-result.txt"
+    if removeStop:
+        class_file_path = "stopword-"
+    elif removeBigAndSmall:
+        class_file_path = "wordlength-"
+    else:
+        class_file_path = "baseline-"
+
+    class_file_path += "result.txt"
+
     class_file = Path(class_file_path)
     output_mode = "a" if class_file.is_file() else "w"
 
@@ -60,14 +68,3 @@ def experiment_stopwords_filtering():
 # Experiment 3
 def experiment_word_len_filtering():
     pass
-
-
-# Experiment 4 (optional)
-def experiment_infrequent_words_filtering():
-    pass
-
-
-# Experiment 5 (optional)
-def experiment_smoothing():
-    pass
-

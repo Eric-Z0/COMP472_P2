@@ -14,3 +14,27 @@ def lower_case_words(words_list):
 
     return word_list_lc
 
+def remove_stop_words(words_list):
+    stop_words = {}
+
+    with open("english-stop-words.txt", mode="r", encoding="latin-1") as file:
+        for line in file:
+            stop_words[line.strip().lower()] = False
+
+    new_word_list = []
+
+    for word in words_list:
+        if word.lower() not in stop_words:
+            new_word_list.append(word.lower())
+
+    return new_word_list
+
+
+def remove_big_and_small_words(word_list):
+    new_word_list = []
+
+    for word in word_list:
+        if len(word) > 2 and len(word) < 9:
+            new_word_list.append(word)
+
+    return new_word_list

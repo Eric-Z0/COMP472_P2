@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-from CompressTech import remove_empty_strings, lower_case_words
+from CompressTech import remove_empty_strings, lower_case_words, remove_stop_words, remove_big_and_small_words
 
 """
 The value for a given word (key) in __index dictionary is composed of four parts:
@@ -24,7 +24,7 @@ class Indexer:
         self.__spam_file_num = 0        # total number of spam files trained
 
     # Build a dictionary with a set of training files
-    def build_dictionary(self):
+    def build_dictionary(self, removeStop = False, removeBigAndSmall = False):
         # Read files / documents
         path_list = Path("train").glob('*.txt')
         for file_path in path_list:
@@ -38,6 +38,12 @@ class Indexer:
                 # Check the type of training file is ham or spam
                 is_ham = True if "ham" in str(file_path) else False
                 is_spam = True if "spam" in str(file_path) else False
+
+                if removeStop:
+                    words_list = remove_stop_words(words_list)
+                
+                if removeBigAndSmall:
+                    words_list = remove_big_and_small_words(words_list)
 
                 if is_ham:
                     for word in words_list:
@@ -112,8 +118,13 @@ class Indexer:
             return False
 
     # Write dictionary to a file
-    def write_dict_to_file(self):
+    def write_dict_to_file(self, removeStop, removeLength):
         dict_file_path = "model.txt"
+        if removeStop:
+            dict_file_path = "stopword-" + dict_file_path
+        elif removeLength:
+            dict_file_path = "wordlength-" + dict_file_path
+            
         with open(dict_file_path, "w") as file:
             counter = 1
             sorted_index = sorted(self.__index)
